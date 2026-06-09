@@ -12,6 +12,10 @@
     <application
         android:name=".FitTrackApp"
         android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:allowBackup="true"
+        android:supportsRtl="true"
         android:theme="@style/Theme.FitTrack">
 
         <activity
@@ -24,7 +28,15 @@
             </intent-filter>
         </activity>
 
-        <!-- FCM Service -->
+        <!--
+          UWAGA: FCM Service (com.fittrack.service.FitTrackFirebaseService)
+          oraz meta-data dla Google Maps zostały wyłączone z głównego buildu.
+          Aby włączyć:
+            1) Skopiuj pliki z android/_external/ do projektu.
+            2) Dodaj zależności Firebase BoM / Maps SDK w app/build.gradle.kts.
+            3) Odkomentuj wpisy poniżej i dodaj plik google-services.json.
+        -->
+        <!--
         <service
             android:name=".service.FitTrackFirebaseService"
             android:exported="false">
@@ -33,9 +45,9 @@
             </intent-filter>
         </service>
 
-        <!-- Google Maps API key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}"/>
+        -->
     </application>
 </manifest>
