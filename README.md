@@ -1,150 +1,137 @@
-# FitTrack — monorepo
+# FitTrack
 
-Monorepo aplikacji **FitTrack** zawierające backend (Spring Boot / Kotlin) i frontend (Android / Kotlin).
+Monorepo aplikacji **FitTrack** — kontroler kalorii i aktywności fizycznej.
+Zawiera backend (Spring Boot + Kotlin + SQLite + JWT) oraz aplikację Android (Kotlin + MVVM + Hilt + Retrofit).
 
-Zawartość pochodzi w 100% z dostarczonego dokumentu `paste.txt` — bez dodawania brakujących plików (encje, repozytoria, DTO, SecurityConfig, layouty XML, build.gradle itd. trzeba uzupełnić ręcznie).
+## Funkcje
 
-## Struktura
+- Rejestracja i logowanie (JWT access + refresh)
+- Profil użytkownika z automatyczną kalkulacją dziennego celu kcal (Mifflin–St Jeor + TDEE)
+- Dziennik posiłków: dodawanie wpisów, swipe-to-delete, dzienne podsumowanie kalorii i makro
+- **Dodawanie posiłku ze zdjęciem** — aparat robi zdjęcie potrawy, użytkownik podaje nazwę i gramaturę, wpis trafia do dziennika
+- Przepisy niskokaloryczne (przeglądanie i tworzenie własnych)
+- Trening: ręczne dodawanie aktywności, dzienny licznik spalonych kcal
+- **Lokalne powiadomienia push** o piciu wody (co 2h), posiłkach (co 4h) i treningu (raz dziennie) — przez WorkManager, bez Firebase
+- OpenAPI / Swagger UI
+
+## Struktura monorepo
 
 ```
 fittrack/
-├── backend/                          ← Spring Boot + Kotlin
-│   ├── src/main/kotlin/com/fittrack/
-│   │   ├── service/                  ← Auth, Profile, Diary, Recipe, Workout, Notification
-│   │   └── controller/               ← REST endpoints
-│   └── src/test/kotlin/com/fittrack/
-│       └── FitTrackIntegrationTest.kt
-│
-├── android/                          ← Android Studio
-│   └── app/src/main/
-│       ├── kotlin/com/fittrack/
-│       │   ├── ui/auth/              ← Login, Register, AuthViewModel
-│       │   ├── ui/navigation/        ← MainFragment + BottomNav
-│       │   ├── ui/diary/             ← Diary, BarcodeScanner, adapter, VM
-│       │   ├── ui/recipes/           ← Recipes, adapter, VM
-│       │   ├── ui/workout/           ← Workout, WorkoutMap (GPS), VM
-│       │   ├── ui/profile/           ← Profile, VM
-│       │   ├── service/              ← FitTrackFirebaseService (FCM)
-│       │   └── worker/               ← WaterReminderWorker
-│       ├── res/navigation/nav_graph.xml
-│       └── AndroidManifest.xml
-│
-└── .github/workflows/ci.yml          ← GitHub Actions CI
+├── android/         aplikacja Android (Kotlin, Gradle Kotlin DSL)
+├── backend/         backend Spring Boot (Kotlin, SQLite, JWT)
+└── README.md        ten plik
 ```
 
-## Schemat bazy danych
-
-```
-┌──────────────┐       ┌──────────────────┐       ┌──────────────────────┐
-│    users     │──1:1──│  user_profiles   │       │  notification_settings│
-│──────────────│       │──────────────────│       │──────────────────────│
-│ id PK        │       │ user_id FK       │       │ user_id FK           │
-│ email UNIQUE │       │ weight_kg        │       │ water_reminders      │
-│ password     │       │ height_cm        │       │ water_reminder_times │
-│ role         │       │ daily_kcal_goal  │       └──────────────────────┘
-└──────┬───────┘       │ activity_level   │
-       │               │ goal             │
-       │1:N            └──────────────────┘
-       │
-  ┌────▼──────────┐   ┌──────────────────┐   ┌──────────────────────────┐
-  │ diary_entries │   │  food_products   │   │   workout_activities     │
-  │───────────────│   │──────────────────│   │──────────────────────────│
-  │ user_id FK    │──▶│ id PK            │   │ user_id FK               │
-  │ entry_date    │   │ name             │   │ activity_date            │
-  │ meal_type     │   │ barcode UNIQUE   │   │ activity_type            │
-  │ product_id FK │   │ kcal_per_100g    │   │ duration_min             │
-  │ recipe_id FK  │   │ protein_g        │   │ kcal_burned              │
-  │ quantity_g    │   │ fat_g            │   │ distance_km              │
-  │ kcal          │   │ carbs_g          │   └──────────┬───────────────┘
-  │ photo_path    │   └──────────────────┘              │1:N
-  │ synced        │                                     │
-  └───────────────┘                             ┌───────▼──────────┐
-                                                │  workout_tracks  │
-  ┌─────────────┐   ┌───────────────────────┐  │──────────────────│
-  │   recipes   │   │  recipe_ingredients   │  │ latitude         │
-  │─────────────│──▶│───────────────────────│  │ longitude        │
-  │ author_id FK│   │ recipe_id FK          │  │ altitude_m       │
-  │ title       │   │ product_id FK         │  │ speed_ms         │
-  │ tags (array)│   │ quantity_g            │  └──────────────────┘
-  │ kcal/serving│   └───────────────────────┘
-  └─────────────┘
-  ┌─────────────────────┐   ┌──────────────────┐   ┌──────────────────┐
-  │ weight_measurements │   │   water_logs     │   │  device_tokens   │
-  │─────────────────────│   │──────────────────│   │──────────────────│
-  │ user_id FK          │   │ user_id FK       │   │ user_id FK       │
-  │ measured_at         │   │ log_date         │   │ fcm_token UNIQUE │
-  │ weight_kg           │   │ amount_ml        │   │ device_name      │
-  └─────────────────────┘   └──────────────────┘   └──────────────────┘
-```
-
-## Mapa endpointów (OpenAPI)
-
-| Metoda    | Endpoint                       | Opis                          |
-|-----------|--------------------------------|-------------------------------|
-| POST      | `/api/auth/register`           | Rejestracja                   |
-| POST      | `/api/auth/login`              | Logowanie → JWT               |
-| POST      | `/api/auth/refresh`            | Odświeżenie tokenu            |
-| GET/PUT   | `/api/profile`                 | Profil + kalkulacja kcal      |
-| GET       | `/api/diary?date=`             | Wpisy dnia                    |
-| POST      | `/api/diary`                   | Dodaj posiłek                 |
-| DELETE    | `/api/diary/{id}`              | Usuń (swipe-to-delete)        |
-| GET       | `/api/diary/summary?date=`     | Podsumowanie kcal             |
-| GET       | `/api/recipes?q=&tag=`         | Wyszukaj/filtruj przepisy     |
-| POST      | `/api/recipes`                 | Utwórz przepis                |
-| GET/POST  | `/api/workouts`                | Treningi                      |
-| POST      | `/api/workouts/{id}/track`     | Punkty GPS trasy              |
-| GET/POST  | `/api/weight`                  | Historia wagi (wykres)        |
-| POST      | `/api/water`                   | Zapis nawodnienia             |
-| POST      | `/api/notifications/token`     | Rejestracja tokenu FCM        |
-| PUT       | `/api/notifications/settings`  | Ustawienia powiadomień push   |
-
-Swagger UI: `/swagger-ui.html` po uruchomieniu aplikacji.
-
-## Kluczowe decyzje techniczne
+## Stack
 
 ### Backend
-- **Flyway** — wersjonowanie schematu bazy, migracje przy każdym starcie
-- **Offline-first** — pole `synced` w `diary_entries` pozwala aplikacji Android zapisywać lokalnie i synchronizować później
-- **FCM** — push notifications przez `firebase-admin` SDK
-- **Barcode** — pole `barcode` w `food_products` (kod EAN), endpoint `GET /api/food/barcode/{code}`
-- **GPS tracking** — tabela `workout_tracks` z indeksem na `(workout_id, recorded_at)`
-- **JWT** — accessToken (24h) + refreshToken (7d)
+- Kotlin 1.9, Spring Boot 3.3.2
+- Spring Data JPA + Hibernate 6 + dialect SQLite
+- Spring Security + BCrypt + JWT (jjwt 0.12)
+- springdoc-openapi 2.6 (Swagger UI)
+- JUnit 5 + MockK + H2 + JaCoCo (raport pokrycia)
 
 ### Android
-| Aspekt          | Rozwiązanie                                    |
-|-----------------|------------------------------------------------|
-| Architektura    | MVVM + Repository                              |
-| DI              | Hilt                                           |
-| Sieć            | Retrofit + OkHttp + AuthInterceptor            |
-| Tokeny          | DataStore Preferences                          |
-| Kamera          | CameraX + ML Kit (barcode)                     |
-| Push            | FCM + WorkManager (przypomnienia 10/14/18)     |
-| Mapy GPS        | Google Maps SDK + FusedLocationProvider        |
-| Offline-first   | pole `synced` + bufor lokalny                  |
-| Nawigacja       | Navigation Component + SafeArgs                |
+- Kotlin 1.9, AGP 8.5, minSdk 26, targetSdk 34
+- MVVM + Repository, Hilt DI, Navigation Component
+- Retrofit 2 + Moshi + OkHttp logging
+- Coroutines + StateFlow, ViewBinding
+- DataStore Preferences (tokeny JWT)
+- WorkManager (cykliczne powiadomienia lokalne)
+- ActivityResultContracts.TakePicture + FileProvider (aparat)
 
-## ⚠️ Status — brakujące pliki
+## Wymagania
 
-Repo zawiera **wyłącznie** pliki z `paste.txt`. Aby projekt się zbudował, musisz dodatkowo wygenerować:
+- JDK 17 (zalecane Eclipse Adoptium)
+- Android Studio Hedgehog (2023.1.1) lub nowszy
+- Gradle 8.7 (wrapper w repo)
 
-**Backend:**
-- `FitTrackApplication.kt`, `build.gradle.kts`, `application.yml`
-- `entity/Entities.kt` (User, UserProfile, DiaryEntry, FoodProduct, Recipe, RecipeIngredient, WorkoutActivity, WorkoutTrack, DeviceToken, NotificationSettings, …)
-- `repository/Repositories.kt`
-- `dto/Dtos.kt`
-- `security/{JwtUtils, JwtAuthFilter, UserDetailsServiceImpl}.kt`
-- `config/SecurityConfig.kt`
-- `db/migration/V1__init_schema.sql` (Flyway)
+## Uruchomienie — backend
 
-**Android:**
-- `FitTrackApp.kt` (`@HiltAndroidApp`), `MainActivity.kt`, `build.gradle.kts`
-- `di/AppModule.kt`
-- `data/api/FitTrackApi.kt`, `AuthInterceptor.kt`
-- `data/model/Models.kt`
-- `data/repository/{Auth,Diary,Recipe,Workout,Profile}Repository.kt`
-- `ui/auth/SplashFragment.kt`, `ui/recipes/RecipeDetailFragment.kt`
-- `util/{TokenManager,Resource}.kt`
-- Wszystkie layouty XML: `fragment_login.xml`, `fragment_register.xml`, `fragment_main.xml`, `fragment_diary.xml`, `fragment_barcode_scanner.xml`, `fragment_recipes.xml`, `fragment_workout.xml`, `fragment_workout_map.xml`, `fragment_profile.xml`, `item_diary_entry.xml`, `item_recipe.xml`
-- `res/values/{strings,colors,themes}.xml`, ikony w `res/drawable/`
+```bash
+cd backend
+./gradlew bootRun        # Linux/macOS
+gradlew.bat bootRun      # Windows cmd
+.\gradlew bootRun        # Windows PowerShell
+```
 
-Przygotowano przy użyciu Claude Sonnet 4.6 (oryginalny dokument).
+Backend startuje na `http://localhost:8080`. Plik bazy SQLite (`fittrack.db`) tworzony jest automatycznie w katalogu roboczym.
+
+**Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+**OpenAPI JSON**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+Szybki test:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@fittrack.pl","password":"tajne123"}'
+```
+
+### JDK 17 na Windowsie
+
+Plik `backend/gradle.properties` zawiera wskazanie `org.gradle.java.home` na lokalną instalację Eclipse Adoptium. Jeśli masz JDK 17 w innym miejscu — zmień tę ścieżkę lub ustaw `JAVA_HOME` przez `setx JAVA_HOME "..."` i otwórz nowy terminal.
+
+## Uruchomienie — Android
+
+1. Otwórz katalog `android/` w Android Studio
+2. Uruchom emulator (API 26+)
+3. Uruchom aplikację (Shift + F10)
+
+Aplikacja łączy się z backendem przez `http://10.0.2.2:8080/` — to alias hosta dla emulatora Androida.
+
+## Testy
+
+```bash
+cd backend
+./gradlew test                            # uruchamia wszystkie testy
+./gradlew jacocoTestReport                # raport pokrycia w build/reports/jacoco
+./gradlew jacocoTestCoverageVerification  # weryfikacja >=60% pokrycia
+```
+
+Pokrycie testami obejmuje wszystkie serwisy logiki biznesowej oraz JwtUtils. Testy integracyjne uruchamiają pełny kontekst Springa na in-memory H2.
+
+## Endpointy API
+
+| Metoda  | Ścieżka                         | Auth      | Opis                              |
+|---------|---------------------------------|-----------|-----------------------------------|
+| POST    | `/api/auth/register`            | publiczne | Rejestracja                       |
+| POST    | `/api/auth/login`               | publiczne | Logowanie                         |
+| POST    | `/api/auth/refresh`             | publiczne | Odświeżenie access token          |
+| GET     | `/api/profile`                  | JWT       | Pobierz profil                    |
+| PUT     | `/api/profile`                  | JWT       | Aktualizuj profil + cel kcal      |
+| GET     | `/api/diary?date=YYYY-MM-DD`    | JWT       | Wpisy dnia                        |
+| POST    | `/api/diary`                    | JWT       | Dodaj wpis (też zdjęcie potrawy)  |
+| DELETE  | `/api/diary/{id}`               | JWT       | Usuń wpis                         |
+| GET     | `/api/diary/summary?date=...`   | JWT       | Dzienne podsumowanie kcal i makro |
+| GET     | `/api/food/search?q=`           | JWT       | Wyszukaj produkt                  |
+| GET     | `/api/recipes?q=&tag=`          | publiczne | Lista przepisów                   |
+| POST    | `/api/recipes`                  | JWT       | Stwórz przepis                    |
+| GET     | `/api/workouts?date=...`        | JWT       | Treningi danego dnia              |
+| POST    | `/api/workouts`                 | JWT       | Dodaj trening                     |
+| PUT     | `/api/notifications/settings`   | JWT       | Preferencje powiadomień           |
+
+Pełny opis i schematy w Swagger UI.
+
+## Powiadomienia lokalne
+
+Aplikacja **nie używa Firebase**. Cykliczne przypomnienia są planowane przez `WorkManager` i wyświetlane jako lokalne `NotificationCompat`:
+
+- woda — co 2 godziny
+- posiłki — co 4 godziny
+- trening — raz dziennie
+
+Na Android 13+ aplikacja pyta o uprawnienie `POST_NOTIFICATIONS` przy pierwszym uruchomieniu.
+
+## Bezpieczeństwo
+
+- Hasła przechowywane jako BCrypt (siła 10)
+- JWT podpisany HS256 z 256-bitowym sekretem (Base64 w `application.yml`)
+- Access token 1h, refresh token 30 dni
+- CORS otwarty na potrzeby developmentu — przed wdrożeniem produkcyjnym ograniczyć
+- Sekret JWT w `application.yml` należy zmienić przed wdrożeniem na produkcję
+
+## Licencja i autor
+
+Projekt akademicki, autor: jakub-kucharski.
