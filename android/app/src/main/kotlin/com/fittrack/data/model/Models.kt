@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
-// ── Auth ─────────────────────────────────────────────
+// -- Auth -------------------------------------------------
 @JsonClass(generateAdapter = true)
 data class RegisterRequest(val email: String, val password: String)
 
@@ -17,7 +17,7 @@ data class RefreshRequest(val refreshToken: String)
 @JsonClass(generateAdapter = true)
 data class TokenResponse(val accessToken: String, val refreshToken: String)
 
-// ── Profile ──────────────────────────────────────────
+// -- Profile ----------------------------------------------
 @JsonClass(generateAdapter = true)
 data class ProfileResponse(
     val displayName: String?  = null,
@@ -42,19 +42,18 @@ data class ProfileUpdateRequest(
     val goal: String?         = null
 )
 
-// ── Food ─────────────────────────────────────────────
+// -- Food -------------------------------------------------
 @JsonClass(generateAdapter = true)
 data class FoodProductDto(
     val id: Long,
     val name: String,
-    val barcode: String?  = null,
     val kcalPer100g: Double = 0.0,
     val proteinG: Double  = 0.0,
     val fatG: Double      = 0.0,
     val carbsG: Double    = 0.0
 )
 
-// ── Diary ────────────────────────────────────────────
+// -- Diary ------------------------------------------------
 @JsonClass(generateAdapter = true)
 data class DiaryEntryRequest(
     val entryDate: String,
@@ -95,7 +94,7 @@ data class DailySummaryResponse(
     val carbsG: Double = 0.0
 )
 
-// ── Recipes ──────────────────────────────────────────
+// -- Recipes ----------------------------------------------
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class RecipeResponse(
@@ -132,7 +131,7 @@ data class RecipeRequest(
     val ingredients: List<RecipeIngredientDto> = emptyList()
 )
 
-// ── Workouts ─────────────────────────────────────────
+// -- Workouts ---------------------------------------------
 @JsonClass(generateAdapter = true)
 data class WorkoutRequest(
     val activityDate: String,
@@ -155,19 +154,7 @@ data class WorkoutResponse(
     val notes: String?      = null
 )
 
-@JsonClass(generateAdapter = true)
-data class GpsPointRequest(
-    val recordedAt: String,
-    val latitude: Double,
-    val longitude: Double,
-    val altitudeM: Double? = null,
-    val speedMs: Double?   = null
-)
-
-// ── Notifications ────────────────────────────────────
-@JsonClass(generateAdapter = true)
-data class DeviceTokenRequest(val fcmToken: String, val deviceName: String?)
-
+// -- Notifications (lokalne) ------------------------------
 @JsonClass(generateAdapter = true)
 data class NotificationSettingsRequest(
     val waterReminders: Boolean = true,

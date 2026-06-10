@@ -5,7 +5,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.fittrack.R
 import com.fittrack.data.model.WorkoutRequest
 import com.fittrack.databinding.FragmentWorkoutBinding
@@ -28,33 +27,26 @@ class WorkoutFragment : Fragment(R.layout.fragment_workout) {
 
         vm.loadToday()
 
-        // Przycisk ręcznego dodania treningu
         b.btnAddWorkout.setOnClickListener { showAddWorkoutDialog() }
-
-        // Przycisk startu śledzenia GPS (bieg/spacer)
-        b.btnStartTracking.setOnClickListener {
-            findNavController().navigate(R.id.main_to_workout_map)
-        }
 
         lifecycleScope.launch {
             vm.workouts.collect { state ->
                 if (state is com.fittrack.util.Resource.Success) {
                     val totalBurned = state.data.sumOf { it.kcalBurned }
-                    b.tvKcalBurned.text = "Spalone dziś: $totalBurned kcal"
+                    b.tvKcalBurned.text = "Spalone dzis: $totalBurned kcal"
                 }
             }
         }
     }
 
     private fun showAddWorkoutDialog() {
-        val types = arrayOf("Siłownia", "Rower", "Pływanie", "Joga", "Inne")
-        var selectedType = "Siłownia"
+        val types = arrayOf("Silownia", "Rower", "Plywanie", "Joga", "Inne")
+        var selectedType = "Silownia"
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Dodaj trening")
             .setSingleChoiceItems(types, 0) { _, which -> selectedType = types[which] }
             .setPositiveButton("Zapisz") { _, _ ->
-                // W produkcji: BottomSheetDialog z polami duration + kcal
                 vm.logWorkout(WorkoutRequest(
                     activityDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE),
                     activityType = selectedType.uppercase(),

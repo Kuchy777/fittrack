@@ -25,12 +25,24 @@
     <string name="kcal_remaining_placeholder">Pozostałe: 0 kcal</string>
     <string name="add_entry">Dodaj wpis</string>
 
-    <!-- Scanner stub -->
-    <string name="scanner_title">Skaner kodu kreskowego</string>
-    <string name="scanner_stub_info">Wersja demo: wpisz kod EAN ręcznie. Pełna obsługa kamery (ML Kit) dostępna po dodaniu zależności — zobacz README w katalogu _external.</string>
-    <string name="hint_barcode">Kod EAN</string>
-    <string name="btn_find">Wyszukaj</string>
+    <!-- Dodaj zdjęciem -->
+    <string name="food_photo_title">Dodaj zdjęciem</string>
+    <string name="food_photo_hint">Zrób zdjęcie potrawy i dodaj wpis do dziennika.</string>
+    <string name="cd_food_photo">Zdjęcie potrawy</string>
+    <string name="btn_take_photo">Zrób zdjęcie</string>
+    <string name="hint_dish_name">Nazwa potrawy</string>
+    <string name="hint_quantity_g">Gramatura (g)</string>
+    <string name="hint_kcal_optional">Kalorie (opcjonalnie)</string>
+    <string name="label_meal_type">Posiłek</string>
+    <string name="meal_breakfast">Śniadanie</string>
+    <string name="meal_lunch">Obiad</string>
+    <string name="meal_dinner">Kolacja</string>
+    <string name="meal_snack">Przekąska</string>
+    <string name="btn_save_to_diary">Zapisz do dziennika</string>
     <string name="btn_cancel">Anuluj</string>
+    <string name="err_dish_name_required">Podaj nazwę potrawy</string>
+    <string name="photo_cancelled">Anulowano zdjęcie</string>
+    <string name="entry_added">Wpis dodany</string>
 
     <!-- Recipes -->
     <string name="hint_search_recipes">Szukaj przepisów…</string>
@@ -41,10 +53,6 @@
     <string name="workout_title">Trening</string>
     <string name="kcal_burned_placeholder">0 kcal spalone</string>
     <string name="btn_add_workout">Dodaj trening</string>
-    <string name="btn_start_tracking">Rozpocznij śledzenie GPS</string>
-    <string name="workout_map_title">Śledzenie GPS</string>
-    <string name="workout_map_stub_info">Wersja demo bez Google Maps. Aby włączyć: dodaj klucz API i zależności z _external/maps/.</string>
-    <string name="btn_close">Zamknij</string>
 
     <!-- Profile -->
     <string name="profile_title">Profil i cele</string>
@@ -72,7 +80,5 @@
     </string-array>
 
     <!-- Notifications -->
-    <string name="notif_water_title">Pij wodę</string>
-    <string name="notif_water_body">Czas na szklankę wody — utrzymuj nawodnienie.</string>
     <string name="notif_channel_general">FitTrack — ogólne</string>
 </resources>

@@ -10,8 +10,7 @@ import java.time.LocalDate
 @Service
 class WorkoutService(
     private val userRepo: UserRepository,
-    private val workoutRepo: WorkoutActivityRepository,
-    private val trackRepo: WorkoutTrackRepository
+    private val workoutRepo: WorkoutActivityRepository
 ) {
     @Transactional
     fun log(email: String, req: WorkoutRequest): WorkoutResponse {
@@ -27,23 +26,6 @@ class WorkoutService(
             notes        = req.notes
         ))
         return w.toResponse()
-    }
-
-    @Transactional
-    fun addGpsPoints(email: String, workoutId: Long, points: List<GpsPointRequest>) {
-        val user = userRepo.findByEmail(email).orElseThrow()
-        val workout = workoutRepo.findById(workoutId).orElseThrow()
-        require(workout.user.id == user.id) { "Brak uprawnień" }
-        points.forEach { p ->
-            trackRepo.save(WorkoutTrack(
-                workout    = workout,
-                recordedAt = p.recordedAt,
-                latitude   = p.latitude,
-                longitude  = p.longitude,
-                altitudeM  = p.altitudeM,
-                speedMs    = p.speedMs
-            ))
-        }
     }
 
     fun getForDate(email: String, date: LocalDate): List<WorkoutResponse> {

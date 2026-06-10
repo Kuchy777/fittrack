@@ -3,7 +3,8 @@ package com.fittrack
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import com.fittrack.worker.WaterReminderWorker
+import com.fittrack.notification.NotificationHelper
+import com.fittrack.notification.NotificationScheduler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -19,7 +20,8 @@ class FitTrackApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        // Planowanie codziennych przypomnień o wodzie: 10:00 / 14:00 / 18:00
-        WaterReminderWorker.schedule(this)
+        // Lokalne powiadomienia (bez Firebase): kanal + cykliczne przypomnienia.
+        NotificationHelper.ensureChannel(this)
+        NotificationScheduler.scheduleAll(this)
     }
 }

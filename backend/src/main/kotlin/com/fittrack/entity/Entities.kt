@@ -72,9 +72,6 @@ class FoodProduct(
     @Column(nullable = false)
     var name: String = "",
 
-    @Column(unique = true)
-    var barcode: String? = null,
-
     @Column(name = "kcal_per_100g", nullable = false, precision = 7, scale = 2)
     var kcalPer100g: BigDecimal = BigDecimal.ZERO,
 
@@ -259,28 +256,4 @@ class WorkoutActivity(
     var createdAt: Instant = Instant.now()
 )
 
-@Entity
-@Table(name = "workout_tracks")
-class WorkoutTrack(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = 0,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workout_id", nullable = false)
-    var workout: WorkoutActivity,
-
-    @Column(name = "recorded_at", nullable = false)
-    var recordedAt: Instant,
-
-    @Column(nullable = false, precision = 10, scale = 7)
-    var latitude: BigDecimal,
-
-    @Column(nullable = false, precision = 10, scale = 7)
-    var longitude: BigDecimal,
-
-    @Column(name = "altitude_m", precision = 7, scale = 2)
-    var altitudeM: BigDecimal? = null,
-
-    @Column(name = "speed_ms", precision = 6, scale = 2)
-    var speedMs: BigDecimal? = null
-)

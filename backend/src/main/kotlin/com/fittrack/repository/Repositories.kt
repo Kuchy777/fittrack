@@ -20,9 +20,7 @@ interface UserProfileRepository : JpaRepository<UserProfile, Long> {
 }
 
 @Repository
-interface FoodProductRepository : JpaRepository<FoodProduct, Long> {
-    fun findByBarcode(barcode: String): Optional<FoodProduct>
-}
+interface FoodProductRepository : JpaRepository<FoodProduct, Long>
 
 @Repository
 interface DiaryEntryRepository : JpaRepository<DiaryEntry, Long> {
@@ -51,9 +49,4 @@ interface RecipeRepository : JpaRepository<Recipe, Long> {
 @Repository
 interface WorkoutActivityRepository : JpaRepository<WorkoutActivity, Long> {
     fun findAllByUserIdAndActivityDate(userId: Long, activityDate: LocalDate): List<WorkoutActivity>
-}
-
-@Repository
-interface WorkoutTrackRepository : JpaRepository<WorkoutTrack, Long> {
-    fun findAllByWorkoutId(workoutId: Long): List<WorkoutTrack>
 }

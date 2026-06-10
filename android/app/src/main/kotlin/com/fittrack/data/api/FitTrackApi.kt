@@ -39,9 +39,6 @@ interface FitTrackApi {
     @GET("api/food/search")
     suspend fun searchFood(@Query("q") query: String): List<FoodProductDto>
 
-    @GET("api/food/barcode/{code}")
-    suspend fun getFoodByBarcode(@Path("code") code: String): FoodProductDto
-
     // ── Recipes ──────────────────────────────────────
     @GET("api/recipes")
     suspend fun searchRecipes(
@@ -59,16 +56,7 @@ interface FitTrackApi {
     @POST("api/workouts")
     suspend fun logWorkout(@Body req: WorkoutRequest): WorkoutResponse
 
-    @POST("api/workouts/{id}/track")
-    suspend fun addGpsPoints(
-        @Path("id") workoutId: Long,
-        @Body points: List<GpsPointRequest>
-    )
-
-    // ── Notifications ────────────────────────────────
-    @POST("api/notifications/token")
-    suspend fun registerDeviceToken(@Body req: DeviceTokenRequest)
-
+    // ── Notifications (lokalne — backend trzyma tylko preferencje) ──
     @PUT("api/notifications/settings")
     suspend fun updateNotificationSettings(@Body req: NotificationSettingsRequest)
 }

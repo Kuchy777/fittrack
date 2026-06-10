@@ -4,10 +4,12 @@
     <!-- Uprawnienia -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
 
     <application
         android:name=".FitTrackApp"
@@ -28,26 +30,15 @@
             </intent-filter>
         </activity>
 
-        <!--
-          UWAGA: FCM Service (com.fittrack.service.FitTrackFirebaseService)
-          oraz meta-data dla Google Maps zostały wyłączone z głównego buildu.
-          Aby włączyć:
-            1) Skopiuj pliki z android/_external/ do projektu.
-            2) Dodaj zależności Firebase BoM / Maps SDK w app/build.gradle.kts.
-            3) Odkomentuj wpisy poniżej i dodaj plik google-services.json.
-        -->
-        <!--
-        <service
-            android:name=".service.FitTrackFirebaseService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}"/>
-        -->
+        <!-- FileProvider dla zdjec potraw (aparat zwraca URI) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 </manifest>

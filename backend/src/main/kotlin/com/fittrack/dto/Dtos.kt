@@ -2,7 +2,6 @@ package com.fittrack.dto
 
 import jakarta.validation.constraints.*
 import java.math.BigDecimal
-import java.time.Instant
 import java.time.LocalDate
 
 // =================== AUTH ===================
@@ -147,10 +146,4 @@ data class WorkoutResponse(
     val notes: String?
 )
 
-data class GpsPointRequest(
-    @field:NotNull val recordedAt: Instant,
-    @field:NotNull val latitude: BigDecimal,
-    @field:NotNull val longitude: BigDecimal,
-    val altitudeM: BigDecimal? = null,
-    val speedMs: BigDecimal? = null
-)
+

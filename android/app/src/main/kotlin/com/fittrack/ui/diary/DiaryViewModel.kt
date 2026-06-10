@@ -59,13 +59,4 @@ class DiaryViewModel @Inject constructor(
             _foodSearch.value = repo.searchFood(query)
         }
     }
-
-    fun getFoodByBarcode(code: String) = viewModelScope.launch {
-        _foodSearch.value = Resource.Loading
-        _foodSearch.value = when (val res = repo.getFoodByBarcode(code)) {
-            is Resource.Success -> Resource.Success(listOf(res.data))
-            is Resource.Error   -> Resource.Error(res.message)
-            else -> Resource.Loading
-        }
-    }
 }

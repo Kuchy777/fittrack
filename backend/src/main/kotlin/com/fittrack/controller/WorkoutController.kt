@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
-@Tag(name = "Workout", description = "Treningi i śledzenie GPS")
+@Tag(name = "Workout", description = "Treningi")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/workouts")
@@ -28,12 +28,4 @@ class WorkoutController(private val workoutService: WorkoutService) {
     @ResponseStatus(HttpStatus.CREATED)
     fun log(@AuthenticationPrincipal ud: UserDetails, @Valid @RequestBody req: WorkoutRequest) =
         workoutService.log(ud.username, req)
-
-    @PostMapping("/{id}/track")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addGps(
-        @AuthenticationPrincipal ud: UserDetails,
-        @PathVariable id: Long,
-        @RequestBody points: List<GpsPointRequest>
-    ) = workoutService.addGpsPoints(ud.username, id, points)
 }

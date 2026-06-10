@@ -12,36 +12,30 @@ class DiaryRepository @Inject constructor(private val api: FitTrackApi) {
     suspend fun getEntries(date: String): Resource<List<DiaryEntryResponse>> = try {
         Resource.Success(api.getDiaryEntries(date))
     } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd pobierania wpisów")
+        Resource.Error(t.localizedMessage ?: "Blad pobierania wpisow")
     }
 
     suspend fun addEntry(req: DiaryEntryRequest): Resource<DiaryEntryResponse> = try {
         Resource.Success(api.addDiaryEntry(req))
     } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd dodawania wpisu")
+        Resource.Error(t.localizedMessage ?: "Blad dodawania wpisu")
     }
 
     suspend fun deleteEntry(id: Long): Resource<Unit> = try {
         api.deleteDiaryEntry(id); Resource.Success(Unit)
     } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd usuwania")
+        Resource.Error(t.localizedMessage ?: "Blad usuwania")
     }
 
     suspend fun getDailySummary(date: String): Resource<DailySummaryResponse> = try {
         Resource.Success(api.getDailySummary(date))
     } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd podsumowania")
+        Resource.Error(t.localizedMessage ?: "Blad podsumowania")
     }
 
     suspend fun searchFood(query: String): Resource<List<FoodProductDto>> = try {
         Resource.Success(api.searchFood(query))
     } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd wyszukiwania")
-    }
-
-    suspend fun getFoodByBarcode(code: String): Resource<FoodProductDto> = try {
-        Resource.Success(api.getFoodByBarcode(code))
-    } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Nie znaleziono produktu")
+        Resource.Error(t.localizedMessage ?: "Blad wyszukiwania")
     }
 }

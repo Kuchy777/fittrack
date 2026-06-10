@@ -37,8 +37,4 @@ class WorkoutViewModel @Inject constructor(
         _logState.value = repo.log(req)
         loadToday()
     }
-
-    fun addGpsPoints(workoutId: Long, points: List<GpsPointRequest>) = viewModelScope.launch {
-        repo.addGpsPoints(workoutId, points)
-    }
 }

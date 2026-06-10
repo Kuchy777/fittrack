@@ -18,10 +18,6 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // Wstrzykiwany do AndroidManifest.xml (meta-data Maps API key).
-        // W emulatorze mapa pokaże szary kafelek — to OK do symulacji.
-        manifestPlaceholders["MAPS_API_KEY"] = "DEMO_KEY_REPLACE_ME"
-
         // Bazowy URL backendu. 10.0.2.2 to localhost hosta z emulatora Androida.
         buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080/\"")
     }

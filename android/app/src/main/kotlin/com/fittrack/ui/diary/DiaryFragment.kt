@@ -85,10 +85,10 @@ class DiaryFragment : Fragment(R.layout.fragment_diary) {
         ItemTouchHelper(swipe).attachToRecyclerView(b.rvDiary)
     }
 
-    // FAB → skaner kodu kreskowego lub wyszukiwarka
+    // FAB → ekran "Dodaj zdjeciem" (aparat + nazwa potrawy)
     private fun setupFab() {
         b.fab.setOnClickListener {
-            findNavController().navigate(R.id.main_to_scanner)
+            findNavController().navigate(R.id.main_to_food_photo)
         }
     }
 
