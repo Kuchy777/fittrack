@@ -1,0 +1,20 @@
+FitTrack to lekki dziennik zdrowotny dla osób, które chcą trzymać formę bez komplikacji.
+
+Co potrafi FitTrack:
+• Dziennik posiłków – dodaj produkt z bazy lub zrób zdjęcie potrawy aparatem, wpisz kalorie i makroskładniki
+• Automatyczny dzienny cel kcal – wzór Mifflin–St Jeor na podstawie wagi, wzrostu, aktywności i celu (utrzymanie, redukcja, przyrost)
+• Treningi – proste logowanie aktywności (typ, czas, spalone kcal)
+• Przepisy niskokaloryczne – biblioteka prostych, lekkich posiłków
+• Lokalne przypomnienia – picie wody co 2 h, posiłki co 4 h, ruch raz dziennie. Bez serwera, bez Firebase.
+• Pełna prywatność – konto na Twoim własnym backendzie, dane nie trafiają do firm trzecich
+
+FitTrack nie zbiera danych marketingowych, nie pokazuje reklam i nie wymaga lokalizacji.
+
+Aplikacja wymaga konta na backendzie FitTrack (domyślnie http://10.0.2.2:8080 dla emulatora — w produkcji własny serwer).
+
+Wymagania:
+• Android 8.0 (API 26) lub nowszy
+• Dostęp do aparatu (opcjonalnie, do zdjęć potraw)
+• Powiadomienia (Android 13+ wymaga zgody)
+
+Projekt open-source: https://github.com/Kuchy777/fittrack

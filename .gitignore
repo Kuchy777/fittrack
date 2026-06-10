@@ -39,3 +39,9 @@ hs_err_pid*
 # Secrets
 *.env
 .env.local
+
+# Keystore (NIGDY nie commituj!)
+*.keystore
+*.jks
+keystore.properties
+android/keystore.properties

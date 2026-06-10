@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
     kotlin("plugin.jpa") version "1.9.24"
+    jacoco
 }
 
 group = "com.fittrack"
@@ -43,6 +44,8 @@ dependencies {
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.h2database:h2")
+    testImplementation("io.mockk:mockk:1.13.12")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -54,6 +57,37 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.60".toBigDecimal()
+            }
+            // pomijamy klasy infrastrukturalne, na ktore nie chcemy wymagac pokrycia
+            excludes = listOf(
+                "com.fittrack.FitTrackApplication*",
+                "com.fittrack.config.*",
+                "com.fittrack.security.JwtAuthFilter*",
+                "com.fittrack.security.UserDetailsServiceImpl*"
+            )
+        }
+    }
 }
 
 // JPA wymaga argumentu „all-open" dla encji

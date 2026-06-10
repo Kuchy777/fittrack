@@ -2,6 +2,7 @@ package com.fittrack.controller
 
 import com.fittrack.dto.*
 import com.fittrack.service.WorkoutService
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -18,12 +19,14 @@ import java.time.LocalDate
 @RequestMapping("/api/workouts")
 class WorkoutController(private val workoutService: WorkoutService) {
 
+    @Operation(summary = "Pobierz treningi dla podanej daty (domyślnie dziś)")
     @GetMapping
     fun getForDate(
         @AuthenticationPrincipal ud: UserDetails,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate = LocalDate.now()
     ) = workoutService.getForDate(ud.username, date)
 
+    @Operation(summary = "Dodaj wpis treningu")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun log(@AuthenticationPrincipal ud: UserDetails, @Valid @RequestBody req: WorkoutRequest) =

@@ -1,0 +1,20 @@
+FitTrack is a lightweight health diary for people who want to stay in shape without complications.
+
+Features:
+• Meal diary – add a product from the database or snap a photo of your meal with the camera, log calories and macros
+• Automatic daily kcal goal – Mifflin–St Jeor formula based on weight, height, activity and goal (maintain, lose, gain)
+• Workouts – simple activity logging (type, duration, kcal burned)
+• Low-calorie recipes – library of simple, light meals
+• Local reminders – water every 2 h, meals every 4 h, movement once a day. No server, no Firebase.
+• Full privacy – account on your own backend, data does not go to third parties
+
+FitTrack does not collect marketing data, does not show ads and does not require location.
+
+The app requires an account on the FitTrack backend (defaults to http://10.0.2.2:8080 for the emulator — your own server in production).
+
+Requirements:
+• Android 8.0 (API 26) or newer
+• Camera access (optional, for meal photos)
+• Notifications (Android 13+ requires permission)
+
+Open-source project: https://github.com/Kuchy777/fittrack
