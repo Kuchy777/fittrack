@@ -1,163 +1,129 @@
 package com.fittrack.data.model
 
 import android.os.Parcelable
-import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
-// -- Auth -------------------------------------------------
-@JsonClass(generateAdapter = true)
-data class RegisterRequest(val email: String, val password: String)
-
-@JsonClass(generateAdapter = true)
+// ─── Auth ─────────────────────────────────────────────────────
 data class LoginRequest(val email: String, val password: String)
+data class RegisterRequest(val email: String, val password: String)
+data class AuthResponse(val accessToken: String?, val userId: Long?, val email: String?)
+data class ChangePasswordRequest(val oldPassword: String, val newPassword: String)
 
-@JsonClass(generateAdapter = true)
-data class RefreshRequest(val refreshToken: String)
-
-@JsonClass(generateAdapter = true)
-data class TokenResponse(val accessToken: String, val refreshToken: String)
-
-// -- Profile ----------------------------------------------
-@JsonClass(generateAdapter = true)
+// ─── Profile ──────────────────────────────────────────────────
 data class ProfileResponse(
-    val displayName: String?  = null,
-    val gender: String?       = null,
-    val birthDate: String?    = null,
-    val weightKg: Double?     = null,
-    val heightCm: Double?     = null,
-    val activityLevel: String?= null,
-    val goal: String?         = null,
-    val dailyKcalGoal: Int?   = null,
-    val avatarUrl: String?    = null
+    val userId: Long?,
+    val displayName: String?,
+    val email: String?,
+    val weightKg: Double?,
+    val heightCm: Double?,
+    val birthDate: String?,
+    val gender: String?,
+    val activityLevel: String?,
+    val goal: String?,
+    val dailyKcalGoal: Int?
 )
 
-@JsonClass(generateAdapter = true)
 data class ProfileUpdateRequest(
-    val displayName: String?  = null,
-    val gender: String?       = null,
-    val birthDate: String?    = null,
-    val weightKg: Double?     = null,
-    val heightCm: Double?     = null,
-    val activityLevel: String?= null,
-    val goal: String?         = null
+    val displayName: String?,
+    val weightKg: Double?,
+    val heightCm: Double?,
+    val birthDate: String?,
+    val gender: String?,
+    val activityLevel: String?,
+    val goal: String?
 )
 
-// -- Food -------------------------------------------------
-@JsonClass(generateAdapter = true)
-data class FoodProductDto(
-    val id: Long,
-    val name: String,
-    val kcalPer100g: Double = 0.0,
-    val proteinG: Double  = 0.0,
-    val fatG: Double      = 0.0,
-    val carbsG: Double    = 0.0
-)
-
-// -- Diary ------------------------------------------------
-@JsonClass(generateAdapter = true)
-data class DiaryEntryRequest(
-    val entryDate: String,
-    val mealType: String,
-    val productId: Long? = null,
-    val recipeId: Long?  = null,
-    val customName: String? = null,
-    val quantityG: Double,
-    val photoPath: String?  = null,
-    val note: String?       = null,
-    val synced: Boolean     = true
-)
-
-@JsonClass(generateAdapter = true)
+// ─── Diary ────────────────────────────────────────────────────
+@Parcelize
 data class DiaryEntryResponse(
     val id: Long,
-    val entryDate: String,
+    val productId: Long,
+    val productName: String,
+    val quantityG: Double,
+    val kcal: Double,
+    val proteinG: Double,
+    val fatG: Double,
+    val carbsG: Double,
     val mealType: String,
-    val productName: String? = null,
-    val quantityG: Double = 0.0,
-    val kcal: Double      = 0.0,
-    val proteinG: Double  = 0.0,
-    val fatG: Double      = 0.0,
-    val carbsG: Double    = 0.0,
-    val photoPath: String? = null,
-    val note: String?      = null
-)
+    val date: String
+) : Parcelable
 
-@JsonClass(generateAdapter = true)
 data class DailySummaryResponse(
     val date: String,
-    val kcalGoal: Int = 2000,
-    val kcalConsumed: Double = 0.0,
-    val kcalBurned: Int = 0,
-    val kcalRemaining: Double = 0.0,
-    val proteinG: Double = 0.0,
-    val fatG: Double = 0.0,
-    val carbsG: Double = 0.0
+    val kcalConsumed: Double,
+    val kcalBurned: Double,
+    val kcalGoal: Int,
+    val kcalRemaining: Double,
+    val proteinG: Double,
+    val fatG: Double,
+    val carbsG: Double
 )
 
-// -- Recipes ----------------------------------------------
+data class DiaryUpdateRequest(val quantityG: Double)
+
+// ─── Recipes ──────────────────────────────────────────────────
 @Parcelize
-@JsonClass(generateAdapter = true)
 data class RecipeResponse(
     val id: Long,
     val title: String,
-    val description: String? = null,
-    val imageUrl: String?    = null,
-    val prepTimeMin: Int?    = null,
-    val servings: Int        = 1,
-    val kcalPerServing: Double = 0.0,
-    val proteinG: Double = 0.0,
-    val fatG: Double     = 0.0,
-    val carbsG: Double   = 0.0,
-    val tags: List<String> = emptyList(),
-    val isPublic: Boolean  = true
+    val description: String?,
+    val kcalPerServing: Double,
+    val proteinG: Double,
+    val fatG: Double,
+    val carbsG: Double,
+    val prepTimeMin: Int?,
+    val servings: Int,
+    val imageUrl: String?,
+    val tags: List<String>,
+    val isFavorite: Boolean,
+    val isOwner: Boolean
 ) : Parcelable
 
-@JsonClass(generateAdapter = true)
-data class RecipeIngredientDto(
-    val productId: Long,
-    val quantityG: Double,
-    val unit: String? = null
-)
-
-@JsonClass(generateAdapter = true)
 data class RecipeRequest(
     val title: String,
-    val description: String? = null,
-    val imageUrl: String?    = null,
-    val prepTimeMin: Int?    = null,
-    val servings: Int        = 1,
-    val isPublic: Boolean    = true,
-    val tags: List<String>   = emptyList(),
-    val ingredients: List<RecipeIngredientDto> = emptyList()
+    val description: String?,
+    val kcalPerServing: Double,
+    val proteinG: Double,
+    val fatG: Double,
+    val carbsG: Double,
+    val prepTimeMin: Int?,
+    val servings: Int,
+    val imageUrl: String?,
+    val tags: List<String>
 )
 
-// -- Workouts ---------------------------------------------
-@JsonClass(generateAdapter = true)
-data class WorkoutRequest(
-    val activityDate: String,
-    val activityType: String,
-    val durationMin: Int,
-    val kcalBurned: Int,
-    val distanceKm: Double? = null,
-    val avgHeartRate: Int?  = null,
-    val notes: String?      = null
-)
-
-@JsonClass(generateAdapter = true)
+// ─── Workouts ─────────────────────────────────────────────────
 data class WorkoutResponse(
     val id: Long,
     val activityDate: String,
     val activityType: String,
     val durationMin: Int,
     val kcalBurned: Int,
-    val distanceKm: Double? = null,
-    val notes: String?      = null
+    val notes: String?
 )
 
-// -- Notifications (lokalne) ------------------------------
-@JsonClass(generateAdapter = true)
-data class NotificationSettingsRequest(
-    val waterReminders: Boolean = true,
-    val mealReminders: Boolean  = true,
-    val workoutReminders: Boolean = true
+data class WorkoutRequest(
+    val activityDate: String,
+    val activityType: String,
+    val durationMin: Int,
+    val kcalBurned: Int?,   // null = oblicz automatycznie
+    val notes: String?
+)
+// --- Food / Diary entry ---
+data class DiaryEntryRequest(
+    val productId: Long,
+    val quantityG: Double,
+    val mealType: String,
+    val entryDate: String
+)
+
+// --- Products (wyszukiwarka) ---
+data class ProductResponse(
+    val id: Long,
+    val name: String,
+    val kcalPer100g: Double,
+    val proteinPer100g: Double,
+    val fatPer100g: Double,
+    val carbsPer100g: Double,
+    val barcode: String?
 )

@@ -16,7 +16,7 @@ class SplashFragment : Fragment(R.layout.fragment_splash) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.postDelayed({
-            val target = if (vm.isLoggedIn()) R.id.to_main else R.id.to_login
+            val target = if (vm.isLoggedIn.value) R.id.to_main else R.id.to_login
             findNavController().navigate(target)
         }, 700)
     }

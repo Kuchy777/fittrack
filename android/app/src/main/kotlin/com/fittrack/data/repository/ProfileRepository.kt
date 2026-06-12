@@ -1,24 +1,29 @@
 package com.fittrack.data.repository
 
 import com.fittrack.data.api.FitTrackApi
-import com.fittrack.data.model.ProfileResponse
-import com.fittrack.data.model.ProfileUpdateRequest
+import com.fittrack.data.model.*
 import com.fittrack.util.Resource
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ProfileRepository @Inject constructor(private val api: FitTrackApi) {
-
-    suspend fun getProfile(): Resource<ProfileResponse> = try {
+    suspend fun get(): Resource<ProfileResponse> = try {
         Resource.Success(api.getProfile())
-    } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd pobierania profilu")
+    } catch (e: HttpException) {
+        val errorMsg = e.response()?.errorBody()?.string() ?: e.message()
+        Resource.Error(errorMsg)
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Błąd pobierania profilu")
     }
 
     suspend fun update(req: ProfileUpdateRequest): Resource<ProfileResponse> = try {
         Resource.Success(api.updateProfile(req))
-    } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Błąd aktualizacji profilu")
+    } catch (e: HttpException) {
+        val errorMsg = e.response()?.errorBody()?.string() ?: e.message()
+        Resource.Error(errorMsg)
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Błąd zapisywania profilu")
     }
 }

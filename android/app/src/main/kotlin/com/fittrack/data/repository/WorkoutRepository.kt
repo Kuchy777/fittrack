@@ -1,24 +1,26 @@
 package com.fittrack.data.repository
 
 import com.fittrack.data.api.FitTrackApi
-import com.fittrack.data.model.WorkoutRequest
-import com.fittrack.data.model.WorkoutResponse
+import com.fittrack.data.model.*
 import com.fittrack.util.Resource
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class WorkoutRepository @Inject constructor(private val api: FitTrackApi) {
-
-    suspend fun getForDate(date: String): Resource<List<WorkoutResponse>> = try {
+    suspend fun getForDate(date: String): Resource<List<WorkoutResponse>> = runCatching {
         Resource.Success(api.getWorkouts(date))
-    } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Blad pobierania treningow")
-    }
+    }.getOrElse { Resource.Error(it.message ?: "Błąd pobierania treningów") }
 
-    suspend fun log(req: WorkoutRequest): Resource<WorkoutResponse> = try {
+    suspend fun log(req: WorkoutRequest): Resource<WorkoutResponse> = runCatching {
         Resource.Success(api.logWorkout(req))
-    } catch (t: Throwable) {
-        Resource.Error(t.localizedMessage ?: "Blad zapisu treningu")
-    }
+    }.getOrElse { Resource.Error(it.message ?: "Błąd dodawania treningu") }
+
+    suspend fun update(id: Long, req: WorkoutRequest): Resource<WorkoutResponse> = runCatching {
+        Resource.Success(api.updateWorkout(id, req))
+    }.getOrElse { Resource.Error(it.message ?: "Błąd aktualizacji treningu") }
+
+    suspend fun delete(id: Long): Resource<Unit> = runCatching {
+        api.deleteWorkout(id); Resource.Success(Unit)
+    }.getOrElse { Resource.Error(it.message ?: "Błąd usuwania treningu") }
 }

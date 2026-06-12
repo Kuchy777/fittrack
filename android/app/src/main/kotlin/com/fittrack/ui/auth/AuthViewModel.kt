@@ -12,23 +12,37 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepo: AuthRepository
+    private val repo: AuthRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<Resource<Unit>?>(null)
-    val state: StateFlow<Resource<Unit>?> = _state
+    private val _authState = MutableStateFlow<Resource<Unit>?>(null)
+    val authState: StateFlow<Resource<Unit>?> = _authState
 
-    fun register(email: String, password: String) = viewModelScope.launch {
-        _state.value = Resource.Loading
-        _state.value = authRepo.register(email, password)
-    }
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
 
     fun login(email: String, password: String) = viewModelScope.launch {
-        _state.value = Resource.Loading
-        _state.value = authRepo.login(email, password)
+        _authState.value = Resource.Loading
+        val result = repo.login(email, password)
+        _authState.value = when (result) {
+            is Resource.Success -> Resource.Success(Unit)
+            is Resource.Error   -> Resource.Error(result.message)
+            Resource.Loading    -> Resource.Loading
+        }
     }
 
-    fun logout() = viewModelScope.launch { authRepo.logout() }
+    fun register(email: String, password: String) = viewModelScope.launch {
+        _authState.value = Resource.Loading
+        val result = repo.register(email, password)
+        _authState.value = when (result) {
+            is Resource.Success -> Resource.Success(Unit)
+            is Resource.Error   -> Resource.Error(result.message)
+            Resource.Loading    -> Resource.Loading
+        }
+    }
 
-    fun isLoggedIn() = authRepo.isLoggedIn()
+    fun logout() = viewModelScope.launch {
+        repo.logout()
+        _isLoggedIn.value = false
+    }
 }

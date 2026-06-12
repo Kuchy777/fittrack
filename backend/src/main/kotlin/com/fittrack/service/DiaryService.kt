@@ -20,11 +20,7 @@ class DiaryService(
     fun addEntry(email: String, req: DiaryEntryRequest): DiaryEntryResponse {
         val user = userRepo.findByEmail(email).orElseThrow()
         val product = req.productId?.let { foodRepo.findById(it).orElseThrow() }
-
-        val kcal = if (product != null) {
-            product.kcalPer100g.multiply(req.quantityG).divide(BigDecimal(100))
-        } else BigDecimal.ZERO
-
+        val factor = req.quantityG.divide(BigDecimal(100))
         val entry = diaryRepo.save(DiaryEntry(
             user       = user,
             entryDate  = req.entryDate,
@@ -33,10 +29,10 @@ class DiaryService(
             recipeId   = req.recipeId,
             customName = req.customName,
             quantityG  = req.quantityG,
-            kcal       = kcal,
-            proteinG   = product?.proteinG?.multiply(req.quantityG)?.divide(BigDecimal(100)) ?: BigDecimal.ZERO,
-            fatG       = product?.fatG?.multiply(req.quantityG)?.divide(BigDecimal(100)) ?: BigDecimal.ZERO,
-            carbsG     = product?.carbsG?.multiply(req.quantityG)?.divide(BigDecimal(100)) ?: BigDecimal.ZERO,
+            kcal       = product?.kcalPer100g?.multiply(factor) ?: BigDecimal.ZERO,
+            proteinG   = product?.proteinG?.multiply(factor) ?: BigDecimal.ZERO,
+            fatG       = product?.fatG?.multiply(factor) ?: BigDecimal.ZERO,
+            carbsG     = product?.carbsG?.multiply(factor) ?: BigDecimal.ZERO,
             photoPath  = req.photoPath,
             note       = req.note,
             synced     = req.synced
@@ -50,23 +46,35 @@ class DiaryService(
     }
 
     @Transactional
+    fun updateEntry(email: String, entryId: Long, req: DiaryUpdateRequest): DiaryEntryResponse {
+        val user  = userRepo.findByEmail(email).orElseThrow()
+        val entry = diaryRepo.findById(entryId).orElseThrow()
+        require(entry.user.id == user.id) { "Brak uprawnień" }
+        val factor = req.quantityG.divide(BigDecimal(100))
+        entry.quantityG = req.quantityG
+        entry.kcal    = entry.product?.kcalPer100g?.multiply(factor) ?: BigDecimal.ZERO
+        entry.proteinG = entry.product?.proteinG?.multiply(factor) ?: BigDecimal.ZERO
+        entry.fatG     = entry.product?.fatG?.multiply(factor) ?: BigDecimal.ZERO
+        entry.carbsG   = entry.product?.carbsG?.multiply(factor) ?: BigDecimal.ZERO
+        return diaryRepo.save(entry).toResponse()
+    }
+
+    @Transactional
     fun deleteEntry(email: String, entryId: Long) {
-        val user = userRepo.findByEmail(email).orElseThrow()
+        val user  = userRepo.findByEmail(email).orElseThrow()
         val entry = diaryRepo.findById(entryId).orElseThrow()
         require(entry.user.id == user.id) { "Brak uprawnień" }
         diaryRepo.delete(entry)
     }
 
     fun getDailySummary(email: String, date: LocalDate): DailySummaryResponse {
-        val user    = userRepo.findByEmail(email).orElseThrow()
-        val profile = profileRepo.findByUserId(user.id).orElseThrow()
-        val entries = diaryRepo.findAllByUserIdAndEntryDate(user.id, date)
+        val user     = userRepo.findByEmail(email).orElseThrow()
+        val profile  = profileRepo.findByUserId(user.id).orElseThrow()
+        val entries  = diaryRepo.findAllByUserIdAndEntryDate(user.id, date)
         val workouts = workoutRepo.findAllByUserIdAndActivityDate(user.id, date)
-
         val consumed = entries.fold(BigDecimal.ZERO) { acc, e -> acc + e.kcal }
         val burned   = workouts.sumOf { it.kcalBurned }
         val goal     = profile.dailyKcalGoal ?: 2000
-
         return DailySummaryResponse(
             date          = date,
             kcalGoal      = goal,

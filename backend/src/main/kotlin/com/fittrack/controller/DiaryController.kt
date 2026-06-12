@@ -29,16 +29,28 @@ class DiaryController(private val diaryService: DiaryService) {
     @Operation(summary = "Dodaj wpis do dziennika")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addEntry(@AuthenticationPrincipal ud: UserDetails, @Valid @RequestBody req: DiaryEntryRequest) =
-        diaryService.addEntry(ud.username, req)
+    fun addEntry(
+        @AuthenticationPrincipal ud: UserDetails,
+        @Valid @RequestBody req: DiaryEntryRequest
+    ) = diaryService.addEntry(ud.username, req)
 
-    @Operation(summary = "Usuń wpis (swipe-to-delete)")
+    @Operation(summary = "Edytuj ilość (gramy) wpisu — przelicza kcal")
+    @PatchMapping("/{id}")
+    fun updateEntry(
+        @AuthenticationPrincipal ud: UserDetails,
+        @PathVariable id: Long,
+        @Valid @RequestBody req: DiaryUpdateRequest
+    ) = diaryService.updateEntry(ud.username, id, req)
+
+    @Operation(summary = "Usuń wpis")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteEntry(@AuthenticationPrincipal ud: UserDetails, @PathVariable id: Long) =
-        diaryService.deleteEntry(ud.username, id)
+    fun deleteEntry(
+        @AuthenticationPrincipal ud: UserDetails,
+        @PathVariable id: Long
+    ) = diaryService.deleteEntry(ud.username, id)
 
-    @Operation(summary = "Dzienne podsumowanie kcal")
+    @Operation(summary = "Dzienne podsumowanie kcal i makroskładników")
     @GetMapping("/summary")
     fun summary(
         @AuthenticationPrincipal ud: UserDetails,

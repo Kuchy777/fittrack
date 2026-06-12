@@ -31,5 +31,10 @@
 
     <!-- MainFragment hostuje BottomNavigation + zagnieżdżony graf main_nav_graph -->
     <fragment android:id="@+id/mainFragment"
-        android:name="com.fittrack.ui.navigation.MainFragment"/>
+        android:name="com.fittrack.ui.navigation.MainFragment">
+        <action android:id="@+id/profile_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true"/>
+    </fragment>
 </navigation>

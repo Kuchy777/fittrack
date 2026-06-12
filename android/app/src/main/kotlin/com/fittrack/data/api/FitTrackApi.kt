@@ -5,58 +5,74 @@ import retrofit2.http.*
 
 interface FitTrackApi {
 
-    // ── Auth ─────────────────────────────────────────
-    @POST("api/auth/register")
-    suspend fun register(@Body req: RegisterRequest): TokenResponse
+    // Auth
+    @POST("auth/register")
+    suspend fun register(@Body req: RegisterRequest): AuthResponse
 
-    @POST("api/auth/login")
-    suspend fun login(@Body req: LoginRequest): TokenResponse
+    @POST("auth/login")
+    suspend fun login(@Body req: LoginRequest): AuthResponse
 
-    @POST("api/auth/refresh")
-    suspend fun refresh(@Body req: RefreshRequest): TokenResponse
+    @PATCH("auth/password")
+    suspend fun changePassword(@Body req: ChangePasswordRequest)
 
-    // ── Profile ──────────────────────────────────────
-    @GET("api/profile")
+    // Profile
+    @GET("profile")
     suspend fun getProfile(): ProfileResponse
 
-    @PUT("api/profile")
+    @PUT("profile")
     suspend fun updateProfile(@Body req: ProfileUpdateRequest): ProfileResponse
 
-    // ── Diary ────────────────────────────────────────
-    @GET("api/diary")
-    suspend fun getDiaryEntries(@Query("date") date: String): List<DiaryEntryResponse>
+    // Diary
+    @GET("diary")
+    suspend fun getDiary(@Query("date") date: String): List<DiaryEntryResponse>
 
-    @POST("api/diary")
-    suspend fun addDiaryEntry(@Body req: DiaryEntryRequest): DiaryEntryResponse
-
-    @DELETE("api/diary/{id}")
-    suspend fun deleteDiaryEntry(@Path("id") id: Long)
-
-    @GET("api/diary/summary")
+    @GET("diary/summary")
     suspend fun getDailySummary(@Query("date") date: String): DailySummaryResponse
 
-    // ── Food ─────────────────────────────────────────
-    @GET("api/food/search")
-    suspend fun searchFood(@Query("q") query: String): List<FoodProductDto>
+    @POST("diary")
+    suspend fun addDiaryEntry(@Body req: DiaryEntryRequest): DiaryEntryResponse
 
-    // ── Recipes ──────────────────────────────────────
-    @GET("api/recipes")
-    suspend fun searchRecipes(
-        @Query("q") query: String = "",
-        @Query("tag") tag: String? = null
+    @PATCH("diary/{id}")
+    suspend fun updateDiaryEntry(@Path("id") id: Long, @Body req: DiaryUpdateRequest): DiaryEntryResponse
+
+    @DELETE("diary/{id}")
+    suspend fun deleteDiaryEntry(@Path("id") id: Long)
+
+    // Recipes
+    @GET("recipes")
+    suspend fun getRecipes(
+        @Query("q")   query: String = "",
+        @Query("tag") tag: String?  = null
     ): List<RecipeResponse>
 
-    @POST("api/recipes")
-    suspend fun createRecipe(@Body req: RecipeRequest): RecipeResponse
+    @GET("recipes/mine")
+    suspend fun getMyRecipes(): List<RecipeResponse>
 
-    // ── Workouts ─────────────────────────────────────
-    @GET("api/workouts")
+    @GET("recipes/favorites")
+    suspend fun getFavoriteRecipes(): List<RecipeResponse>
+
+    @POST("recipes/{id}/favorite")
+    suspend fun addFavorite(@Path("id") id: Long)
+
+    @DELETE("recipes/{id}/favorite")
+    suspend fun removeFavorite(@Path("id") id: Long)
+
+    @PUT("recipes/{id}")
+    suspend fun updateRecipe(@Path("id") id: Long, @Body req: RecipeRequest): RecipeResponse
+
+    @DELETE("recipes/{id}")
+    suspend fun deleteRecipe(@Path("id") id: Long)
+
+    // Workouts
+    @GET("workouts")
     suspend fun getWorkouts(@Query("date") date: String): List<WorkoutResponse>
 
-    @POST("api/workouts")
+    @POST("workouts")
     suspend fun logWorkout(@Body req: WorkoutRequest): WorkoutResponse
 
-    // ── Notifications (lokalne — backend trzyma tylko preferencje) ──
-    @PUT("api/notifications/settings")
-    suspend fun updateNotificationSettings(@Body req: NotificationSettingsRequest)
+    @PUT("workouts/{id}")
+    suspend fun updateWorkout(@Path("id") id: Long, @Body req: WorkoutRequest): WorkoutResponse
+
+    @DELETE("workouts/{id}")
+    suspend fun deleteWorkout(@Path("id") id: Long)
 }

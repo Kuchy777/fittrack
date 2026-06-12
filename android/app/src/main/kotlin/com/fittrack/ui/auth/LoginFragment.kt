@@ -40,7 +40,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         lifecycleScope.launch {
-            vm.state.collect { state ->
+            vm.authState.collect { state ->
                 b.progressBar.isVisible = state is Resource.Loading
                 when (state) {
                     is Resource.Success ->

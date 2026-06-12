@@ -22,12 +22,10 @@ class AuthService(
     fun register(req: RegisterRequest): TokenResponse {
         if (userRepo.existsByEmail(req.email))
             throw IllegalArgumentException("Email jest już zarejestrowany")
-
         val user = userRepo.save(
             User(email = req.email, password = passwordEncoder.encode(req.password))
         )
         profileRepo.save(UserProfile(user = user))
-
         return TokenResponse(
             accessToken  = jwtUtils.generateToken(user.email),
             refreshToken = jwtUtils.generateRefreshToken(user.email)
@@ -50,5 +48,14 @@ class AuthService(
             accessToken  = jwtUtils.generateToken(email),
             refreshToken = jwtUtils.generateRefreshToken(email)
         )
+    }
+
+    @Transactional
+    fun changePassword(email: String, req: ChangePasswordRequest) {
+        val user = userRepo.findByEmail(email).orElseThrow()
+        if (!passwordEncoder.matches(req.oldPassword, user.password))
+            throw IllegalArgumentException("Stare hasło jest nieprawidłowe")
+        user.password = passwordEncoder.encode(req.newPassword)
+        userRepo.save(user)
     }
 }

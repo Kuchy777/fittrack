@@ -8,7 +8,9 @@ import java.time.LocalDate
 
 data class RegisterRequest(
     @field:Email @field:NotBlank val email: String,
-    @field:Size(min = 6, max = 100) val password: String
+    @field:Size(min = 8, max = 100, message = "Hasło musi mieć minimum 8 znaków")
+    @field:Pattern(regexp = ".*\\d.*", message = "Hasło musi zawierać co najmniej jedną cyfrę")
+    val password: String
 )
 
 data class LoginRequest(
@@ -18,6 +20,13 @@ data class LoginRequest(
 
 data class RefreshRequest(
     @field:NotBlank val refreshToken: String
+)
+
+data class ChangePasswordRequest(
+    @field:NotBlank val oldPassword: String,
+    @field:Size(min = 8, max = 100, message = "Hasło musi mieć minimum 8 znaków")
+    @field:Pattern(regexp = ".*\\d.*", message = "Hasło musi zawierać co najmniej jedną cyfrę")
+    val newPassword: String
 )
 
 data class TokenResponse(
@@ -30,12 +39,12 @@ data class TokenResponse(
 
 data class ProfileUpdateRequest(
     val displayName: String? = null,
-    val gender: String? = null,            // MALE / FEMALE
+    val gender: String? = null,
     val birthDate: LocalDate? = null,
     val weightKg: BigDecimal? = null,
     val heightCm: BigDecimal? = null,
-    val activityLevel: String? = null,     // SEDENTARY / LIGHT / MODERATE / ACTIVE / VERY_ACTIVE
-    val goal: String? = null,              // LOSE / MAINTAIN / GAIN
+    val activityLevel: String? = null,
+    val goal: String? = null,
     val avatarUrl: String? = null
 )
 
@@ -55,14 +64,18 @@ data class ProfileResponse(
 
 data class DiaryEntryRequest(
     @field:NotNull val entryDate: LocalDate,
-    @field:NotBlank val mealType: String,   // BREAKFAST / LUNCH / DINNER / SNACK
+    @field:NotBlank val mealType: String,
     val productId: Long? = null,
     val recipeId: Long? = null,
     val customName: String? = null,
-    @field:NotNull val quantityG: BigDecimal,
+    @field:NotNull @field:DecimalMin("0.1") val quantityG: BigDecimal,
     val photoPath: String? = null,
     val note: String? = null,
     val synced: Boolean = true
+)
+
+data class DiaryUpdateRequest(
+    @field:NotNull @field:DecimalMin("0.1") val quantityG: BigDecimal
 )
 
 data class DiaryEntryResponse(
@@ -105,12 +118,13 @@ data class RecipeRequest(
     @field:NotNull val prepTimeMin: Int,
     @field:NotNull val servings: Int,
     val isPublic: Boolean = true,
-    val tags: MutableSet<String> = mutableSetOf(),
-    @field:NotEmpty val ingredients: List<RecipeIngredientRequest>
+    val tags: Set<String> = emptySet(),
+    val ingredients: List<RecipeIngredientRequest> = emptyList()
 )
 
 data class RecipeResponse(
     val id: Long,
+    val authorId: Long,
     val title: String,
     val description: String?,
     val imageUrl: String?,
@@ -121,16 +135,17 @@ data class RecipeResponse(
     val fatG: BigDecimal,
     val carbsG: BigDecimal,
     val tags: Set<String>,
-    val isPublic: Boolean
+    val isPublic: Boolean,
+    val isFavorite: Boolean = false
 )
 
-// =================== WORKOUTS ===================
+// =================== WORKOUT ===================
 
 data class WorkoutRequest(
     @field:NotNull val activityDate: LocalDate,
     @field:NotBlank val activityType: String,
-    @field:NotNull val durationMin: Int,
-    @field:NotNull val kcalBurned: Int,
+    @field:Min(1) val durationMin: Int,
+    val kcalBurned: Int? = null,
     val distanceKm: BigDecimal? = null,
     val avgHeartRate: Int? = null,
     val notes: String? = null
@@ -145,5 +160,3 @@ data class WorkoutResponse(
     val distanceKm: BigDecimal?,
     val notes: String?
 )
-
-

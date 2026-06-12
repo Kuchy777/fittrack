@@ -9,16 +9,12 @@ class AuthInterceptor @Inject constructor(
     private val tokenManager: TokenManager
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val req = chain.request()
-        // Endpointy /api/auth/* nie wymagają tokenu
-        val path = req.url.encodedPath
-        val skip = path.startsWith("/api/auth/")
-        val builder = req.newBuilder()
-        if (!skip) {
-            tokenManager.accessTokenBlocking()?.let { token ->
-                builder.header("Authorization", "Bearer $token")
-            }
-        }
-        return chain.proceed(builder.build())
+        val token = tokenManager.getToken()
+        val req = if (token != null) {
+            chain.request().newBuilder()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+        } else chain.request()
+        return chain.proceed(req)
     }
 }

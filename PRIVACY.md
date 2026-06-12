@@ -61,4 +61,4 @@ W razie zmian najnowsza wersja będzie publikowana w repozytorium GitHub aplikac
 
 ## 10. Kontakt
 
-W sprawach związanych z danymi osobowymi: **jakub.kucharski36@gmail.com**
+W sprawach związanych z danymi osobowymi: ****

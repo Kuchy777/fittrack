@@ -29,7 +29,6 @@ interface DiaryEntryRepository : JpaRepository<DiaryEntry, Long> {
 
 @Repository
 interface RecipeRepository : JpaRepository<Recipe, Long> {
-
     @Query("""
         SELECT DISTINCT r FROM Recipe r LEFT JOIN r.tags t
         WHERE r.isPublic = true
@@ -44,9 +43,19 @@ interface RecipeRepository : JpaRepository<Recipe, Long> {
         ORDER BY r.createdAt DESC
     """)
     fun findPublicByTag(@Param("tag") tag: String): List<Recipe>
+
+    fun findAllByAuthorId(authorId: Long): List<Recipe>
+}
+
+@Repository
+interface FavoriteRecipeRepository : JpaRepository<FavoriteRecipe, Long> {
+    fun findAllByUserId(userId: Long): List<FavoriteRecipe>
+    fun findByUserIdAndRecipeId(userId: Long, recipeId: Long): Optional<FavoriteRecipe>
+    fun existsByUserIdAndRecipeId(userId: Long, recipeId: Long): Boolean
 }
 
 @Repository
 interface WorkoutActivityRepository : JpaRepository<WorkoutActivity, Long> {
     fun findAllByUserIdAndActivityDate(userId: Long, activityDate: LocalDate): List<WorkoutActivity>
+    fun findAllByUserId(userId: Long): List<WorkoutActivity>
 }

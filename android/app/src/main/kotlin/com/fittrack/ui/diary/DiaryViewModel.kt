@@ -22,41 +22,44 @@ class DiaryViewModel @Inject constructor(
     private val _entries = MutableStateFlow<Resource<List<DiaryEntryResponse>>>(Resource.Loading)
     val entries: StateFlow<Resource<List<DiaryEntryResponse>>> = _entries
 
-    private val _summary = MutableStateFlow<Resource<DailySummaryResponse>?>(null)
-    val summary: StateFlow<Resource<DailySummaryResponse>?> = _summary
-
-    private val _foodSearch = MutableStateFlow<Resource<List<FoodProductDto>>?>(null)
-    val foodSearch: StateFlow<Resource<List<FoodProductDto>>?> = _foodSearch
-
-    private val _deleteState = MutableStateFlow<Resource<Unit>?>(null)
-    val deleteState: StateFlow<Resource<Unit>?> = _deleteState
+    private val _summary = MutableStateFlow<Resource<DailySummaryResponse>>(Resource.Loading)
+    val summary: StateFlow<Resource<DailySummaryResponse>> = _summary
 
     var currentDate: LocalDate = LocalDate.now()
         private set
 
-    fun loadDay(date: LocalDate = LocalDate.now()) {
+    fun loadDay(date: LocalDate) {
         currentDate = date
+        val dateStr = date.format(fmt)
         viewModelScope.launch {
             _entries.value = Resource.Loading
-            _entries.value = repo.getEntries(date.format(fmt))
-            _summary.value = repo.getDailySummary(date.format(fmt))
+            _entries.value = repo.getEntries(dateStr)
+        }
+        viewModelScope.launch {
+            _summary.value = Resource.Loading
+            _summary.value = repo.getSummary(dateStr)
         }
     }
 
+    fun previousDay() = loadDay(currentDate.minusDays(1))
+    fun nextDay()     = loadDay(currentDate.plusDays(1))
+
     fun addEntry(req: DiaryEntryRequest) = viewModelScope.launch {
-        repo.addEntry(req)
-        loadDay(currentDate)
+        val result = repo.addEntry(req)
+        if (result is Resource.Success) {
+            loadDay(currentDate)
+        } else if (result is Resource.Error) {
+            _entries.value = Resource.Error(result.message)
+        }
     }
 
     fun deleteEntry(id: Long) = viewModelScope.launch {
-        _deleteState.value = repo.deleteEntry(id)
+        repo.deleteEntry(id)
         loadDay(currentDate)
     }
 
-    fun searchFood(query: String) = viewModelScope.launch {
-        if (query.length >= 3) {
-            _foodSearch.value = Resource.Loading
-            _foodSearch.value = repo.searchFood(query)
-        }
+    fun updateEntryQuantity(id: Long, quantityG: Double) = viewModelScope.launch {
+        val result = repo.updateEntry(id, quantityG)
+        if (result is Resource.Success) loadDay(currentDate)
     }
 }

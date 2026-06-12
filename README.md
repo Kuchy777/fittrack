@@ -134,4 +134,4 @@ Na Android 13+ aplikacja pyta o uprawnienie `POST_NOTIFICATIONS` przy pierwszym 
 
 ## Licencja i autor
 
-Projekt akademicki, autor: jakub-kucharski.
+Projekt akademicki, autor: .

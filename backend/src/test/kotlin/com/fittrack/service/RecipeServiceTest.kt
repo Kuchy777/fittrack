@@ -5,6 +5,7 @@ import com.fittrack.dto.RecipeRequest
 import com.fittrack.entity.FoodProduct
 import com.fittrack.entity.Recipe
 import com.fittrack.entity.User
+import com.fittrack.repository.FavoriteRecipeRepository
 import com.fittrack.repository.FoodProductRepository
 import com.fittrack.repository.RecipeRepository
 import com.fittrack.repository.UserRepository
@@ -19,7 +20,8 @@ class RecipeServiceTest {
     private val userRepo: UserRepository = mockk()
     private val recipeRepo: RecipeRepository = mockk()
     private val foodRepo: FoodProductRepository = mockk()
-    private val service = RecipeService(userRepo, recipeRepo, foodRepo)
+    private val favoriteRepo: FavoriteRecipeRepository = mockk()
+    private val service = RecipeService(userRepo, recipeRepo, foodRepo, favoriteRepo)
 
     @Test
     fun `oblicza wartosci odzywcze na porcje`() {
@@ -41,7 +43,6 @@ class RecipeServiceTest {
             servings = 2,
             ingredients = listOf(RecipeIngredientRequest(productId = 1, quantityG = BigDecimal("200")))
         ))
-        // total: 130*2 = 260 kcal; per porcja = 130
         assertEquals(0, BigDecimal("130").compareTo(resp.kcalPerServing))
         assertEquals("Ryz na sniadanie", resp.title)
     }

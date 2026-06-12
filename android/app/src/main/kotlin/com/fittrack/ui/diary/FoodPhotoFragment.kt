@@ -84,12 +84,10 @@ class FoodPhotoFragment : Fragment(R.layout.fragment_food_photo) {
 
         vm.addEntry(
             DiaryEntryRequest(
-                entryDate  = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE),
-                mealType   = mealType,
-                customName = name,
+                productId  = 0L,
                 quantityG  = quantity,
-                photoPath  = photoFile?.absolutePath,
-                note       = note
+                mealType   = mealType,
+                entryDate  = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
             )
         )
         Snackbar.make(b.root, getString(R.string.entry_added), Snackbar.LENGTH_SHORT).show()

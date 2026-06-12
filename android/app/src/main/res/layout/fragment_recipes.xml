@@ -5,7 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.textfield.TextInputLayout
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <com.google.android.material.tabs.TabItem android:text="Wszystkie"/>
+        <com.google.android.material.tabs.TabItem android:text="Moje"/>
+        <com.google.android.material.tabs.TabItem android:text="Ulubione"/>
+    </com.google.android.material.tabs.TabLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilSearch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -13,8 +25,7 @@
         android:hint="@string/hint_search_recipes"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
