@@ -71,7 +71,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 ### JDK 17 na Windowsie
 
-Plik `backend/gradle.properties` zawiera wskazanie `org.gradle.java.home` na lokalną instalację Eclipse Adoptium. Jeśli masz JDK 17 w innym miejscu — zmień tę ścieżkę lub ustaw `JAVA_HOME` przez `setx JAVA_HOME "..."` i otwórz nowy terminal.
+Projekt używa JDK z `JAVA_HOME`. Ustaw je np. przez `setx JAVA_HOME "..."` i otwórz nowy terminal.
 
 ## Uruchomienie — Android
 
